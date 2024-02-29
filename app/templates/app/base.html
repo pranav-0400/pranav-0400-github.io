@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="To-Do List Application">
+    <meta name="keywords" content="to-do list, tasks, productivity">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .title-container {
+            background-color: #343a40;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .title {
+            margin: 0;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .task-table {
+            margin-top: 20px;
+            width: 80%;
+            margin: auto;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .input-group {
+            width: 80%;
+            margin: auto;
+        }
+
+        .action-buttons button {
+            /* margin-right: 5px; Remove this line to use gap property */
+        }
+
+        #editTaskModal {
+            text-align: center;
+        }
+
+        #editTaskModal .modal-dialog {
+            max-width: 400px;
+            margin: 30px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="title-container">
+        <h1 class="title">My To-Do List</h1>
+    </div>
+
+    <div class="input-group mb-3">
+        <form method="post" action="{% url 'home' %}">
+            {% csrf_token %}
+            <input type="text" class="form-control" placeholder="Add a new task" name="task_text">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Add</button>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-bordered task-table">
+        <thead>
+            <tr>
+                <th scope="col">S.No</th>
+                <th scope="col">Task</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="taskList">
+            {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.task }}</td>
+                <td class="action-buttons">
+                    <!-- Modify the Edit button to trigger the modal -->
+                    <button type="button" class="btn btn-warning  btn-sm" data-toggle="modal" data-target="#editTaskModal{{ item.id }}">Edit</button>
+
+                    <!-- Add this form around the Delete button -->
+                    <form method="post" action="{% url 'delete_task' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+
+            <!-- Edit Task Modal -->
+            <div class="modal fade" id="editTaskModal{{ item.id }}" tabindex="-1" role="dialog" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="{% url 'edit_task' item.id %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="edited_text">Edit Task:</label>
+                                    <input type="text" class="form-control" id="edited_text" name="edited_text" value="{{ item.task }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
+
+
